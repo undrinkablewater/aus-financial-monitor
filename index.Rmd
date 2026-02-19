@@ -1,0 +1,68 @@
+---
+title: "Australian Financial Stability Monitor"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+# This chunk loads your libraries and fetches the data silently
+library(flexdashboard)
+library(readrba)
+library(dplyr)
+library(ggplot2)
+
+# Fetching the Cash Rate
+cash_rate_data <- read_rba(series_id = "FIRMMCRID")
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### RBA Cash Rate (Interbank Overnight)
+
+
+```{r}
+# This chunk draws the plot in the dashboard column
+cash_rate_data %>%
+  filter(date >= as.Date("2006-01-01")) %>%
+  ggplot(aes(x = date, y = value)) +
+  geom_line(color = "#0055A4", linewidth = 1) + 
+  theme_minimal() +
+  labs(
+    x = "",
+    y = "Interest Rate (%)",
+    caption = "Source: RBA Table F1"
+  ) +
+  theme(
+    plot.title = element_blank(), 
+    panel.grid.minor = element_blank()
+  )
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### AUD/USD Exchange Rate
+
+```{r}
+# 1. Fetch the exchange rate data
+aud_usd_data <- read_rba(series_id = "FXRUSD")
+
+# 2. Draw the plot
+aud_usd_data %>%
+  filter(date >= as.Date("2006-01-01")) %>%
+  ggplot(aes(x = date, y = value)) +
+  geom_line(color = "#E03C31", linewidth = 1) + # RBA Red
+  theme_minimal() +
+  labs(
+    x = "",
+    y = "USD per 1 AUD",
+    caption = "Source: RBA Table F11"
+  ) +
+  theme(
+    plot.title = element_blank(), 
+    panel.grid.minor = element_blank()
+  )
